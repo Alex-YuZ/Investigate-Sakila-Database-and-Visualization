@@ -89,3 +89,36 @@ SELECT DATE_PART('month', month_trunc) AS rental_month,
   FROM sub1
   GROUP BY 1, 2, 3
   ORDER BY  4 DESC;
+
+  /* QUERY 5 */ 
+-- We would like to know who were our top 10 paying customers, how many payments they made on a monthly basis during 2007, and what was the amount of the monthly payments. Can you write a query to capture the customer name, month and year of payment, and total payment amount for each month by these top 10 paying customers?
+
+-- Get the full_name of the top 10 customer in terms of total payments
+WITH sub AS (
+  SELECT first_name || ' ' || last_name AS full_name,
+       sum(amount) total_payment
+    FROM payment p
+    JOIN customer c ON c.customer_id=p.customer_id
+    GROUP BY 1
+    ORDER BY 2 DESC
+    LIMIT 10),
+
+-- Get the framework of final result without any condition
+  sub2 AS (
+    SELECT DATE_TRUNC('month', payment_date) month_trunc,
+           first_name || ' ' || last_name AS customer_full_name,
+           COUNT(*) pay_count_per_mon,
+           SUM(amount) pay_amount
+      FROM payment p
+      JOIN customer c ON c.customer_id=p.customer_id
+      GROUP BY 1, 2)
+
+-- Filtered the result of `sub2` by the `sub` result (top 10 customer in payment)
+SELECT month_trunc pay_month,
+       customer_full_name full_name,
+       pay_count_per_mon,
+       pay_amount
+  FROM sub2
+ WHERE customer_full_name IN (SELECT full_name
+                                FROM sub)
+ ORDER BY customer_full_name, month_trunc;
