@@ -69,3 +69,23 @@ SELECT name category_name,
   FROM sub2
  GROUP BY 1, 2
  ORDER BY 1, 2
+
+ /*QUERY 4 - query used for 3rd insight*/ 
+ -- We want to find out how the two stores compare in their count of rental orders during every month for all the years we have data for. Write a query that returns the store ID for the store, the year and month and the number of rental orders each store has fulfilled for that month. Your table should include a column for each of the following: year, month, store ID and count of rental orders fulfilled during that month.
+
+WITH sub1 AS (
+  SELECT rental_id,
+         DATE_TRUNC('month', rental_date) month_trunc,
+         st.store_id
+    FROM rental r
+    JOIN staff sf ON r.staff_id=sf.staff_id
+    JOIN store st ON st.store_id=sf.store_id
+)
+
+SELECT DATE_PART('month', month_trunc) AS rental_month,
+       DATE_PART('year', month_trunc) AS rental_year,
+       store_id,
+       COUNT(rental_id) count_rentals
+  FROM sub1
+  GROUP BY 1, 2, 3
+  ORDER BY  4 DESC;
