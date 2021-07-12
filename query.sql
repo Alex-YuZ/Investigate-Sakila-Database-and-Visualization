@@ -122,3 +122,44 @@ SELECT month_trunc pay_month,
  WHERE customer_full_name IN (SELECT full_name
                                 FROM sub)
  ORDER BY customer_full_name, month_trunc;
+
+ /* QUERY 6 - query used for 4th insight */ 
+-- Finally, for each of these top 10 paying customers, I would like to find out the difference across their monthly payments during 2007. Please go ahead and write a query to compare the payment amounts in each successive month. Repeat this for each of these 10 paying customers. Also, it will be tremendously helpful if you can identify the customer name who paid the most difference in terms of payments.
+
+-- Get the full_name of the top 10 customer in terms of total payments
+WITH sub AS (
+  SELECT first_name || ' ' || last_name AS full_name,
+       sum(amount) total_payment
+    FROM payment p
+    JOIN customer c ON c.customer_id=p.customer_id
+    GROUP BY 1
+    ORDER BY 2 DESC
+    LIMIT 10),
+
+-- Get the framework of final result without any condition
+  sub2 AS (
+    SELECT DATE_TRUNC('month', payment_date) month_trunc,
+           first_name || ' ' || last_name AS customer_full_name,
+           COUNT(*) pay_count_per_mon,
+           SUM(amount) pay_amount
+      FROM payment p
+      JOIN customer c ON c.customer_id=p.customer_id
+      GROUP BY 1, 2),
+
+-- Filtered the result of `sub2` by the `sub` result (top 10 customer in payment)
+  sub3 AS (
+    SELECT *
+      FROM sub2
+     WHERE customer_full_name IN (SELECT full_name
+                                    FROM sub)
+  )
+
+-- Calculate the difference between lead() and current
+SELECT month_trunc,
+       customer_full_name,
+       pay_amount,
+       LEAD(pay_amount) OVER (PARTITION BY customer_full_name ORDER BY month_trunc),
+       (LEAD(pay_amount) OVER (PARTITION BY customer_full_name ORDER BY month_trunc) 
+         - pay_amount) AS difference
+  FROM sub3
+ ORDER BY difference DESC;
