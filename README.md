@@ -7,7 +7,7 @@ The data used for this project is based on **Sakila DVD Rental Database**. The *
 
 *(NOTICE: One quirk when exploring this "fake" database is that the rental dates are all from 2005 and 2006, while the payment dates are all from 2007. But it won't affect our analysis.)*
 
-For a quick view on the database, refer to its ERD [here](https://github.com/Alex-YuZ/Investigate-Sakila-Database-and-Visualization/blob/master/dvd-rental-erd-2.pdf)
+For a quick view on the database, refer to its ERD [here](https://github.com/Alex-YuZ/Investigate-Sakila-Database-and-Visualization/blob/master/dvd-rental-erd-2.pdf).
 
 # Insights to Explore
 ## Query 1. What is the rental behavior in family movies?
